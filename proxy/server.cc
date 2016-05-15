@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
 #include <vector>
 #include "server.hpp"
 
@@ -42,9 +43,9 @@ void Server_status::poll()
 {
     addSock(fdListen);
     
-    timeval timeout;
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
+    //timeval timeout;
+    //timeout.tv_sec = 1;
+    //timeout.tv_usec = 0;
     
     for (;;)
     {
@@ -54,7 +55,10 @@ void Server_status::poll()
         FD_ZERO(&fds_temp);
         for (int i : fdClients)
             FD_SET(i, &fds_temp);
-        
+        /* reinitialize timeout or it doesn't work on Linux*/
+        timeval timeout;
+        timeout.tv_sec = 1;
+        timeout.tv_usec = 0; 
         selRet = select(highSock+1, &fds_temp, NULL, NULL, &timeout);
         //printf("%d\n", highSock);
         if (selRet < 0)
